@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [matrix, setMatrix] = useState(Array(3).fill().map(() => Array(3).fill(null)));
+  const initialMatrix = Array(3).fill().map(() => Array(3).fill(null));
+  const [matrix, setMatrix] = useState(initialMatrix);
   const [clicks, setClicks] = useState([]);
 
   const handleClick = (row, col) => {
@@ -17,27 +18,27 @@ function App() {
 
     setMatrix(newMatrix);
     setClicks([...clicks, { row, col }]);
-
-    if (row === 2 && col === 2 && clicks.length === 8) {
-      setTimeout(() => {
-        let newClicks = [...clicks, { row, col }];
-        const interval = setInterval(() => {
-          if (newClicks.length === 0) {
-            clearInterval(interval);
-            return;
-          }
-
-          const { row, col } = newClicks.shift();
-          setMatrix(prevMatrix => prevMatrix.map((r, rowIndex) =>
-            r.map((c, colIndex) => {
-              if (rowIndex === row && colIndex === col) return 'orange';
-              return c;
-            })
-          ));
-        }, 500);
-      }, 500);
-    }
   };
+
+  const handleReset = () => {
+    setMatrix(initialMatrix);
+    setClicks([]);
+  };
+
+  React.useEffect(() => {
+    if (clicks.length === 9) {
+      const orangeMatrix = initialMatrix.map((r, rowIndex) =>
+        r.map((c, colIndex) => {
+          const click = clicks.find(click => click.row === rowIndex && click.col === colIndex);
+          return click ? 'orange' : null;
+        })
+      );
+
+      setTimeout(() => {
+        setMatrix(orangeMatrix);
+      }, 1000);
+    }
+  }, [clicks]);
 
   return (
     <div className="App">
@@ -54,6 +55,7 @@ function App() {
           ))
         )}
       </div>
+      <button onClick={handleReset}>Reset</button>
     </div>
   );
 }

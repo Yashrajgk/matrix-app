@@ -1,12 +1,8 @@
 .App {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding: 20px;
-}
-
-h1 {
-  margin-bottom: 20px;
+  height: 100vh;
 }
 
 .matrix {
