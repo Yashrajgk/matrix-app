@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const initialMatrix = Array(3).fill().map(() => Array(3).fill(null));
-  const [matrix, setMatrix] = useState(initialMatrix);
+  const [matrix, setMatrix] = useState(Array(3).fill().map(() => Array(3).fill(null)));
   const [clicks, setClicks] = useState([]);
 
   const handleClick = (row, col) => {
-    if (matrix[row][col] === 'green' || clicks.length === 9) return;
+    if (matrix[row][col] || clicks.length === 9) return;
 
     const newMatrix = matrix.map((r, rowIndex) =>
       r.map((c, colIndex) => {
@@ -18,31 +17,33 @@ function App() {
 
     setMatrix(newMatrix);
     setClicks([...clicks, { row, col }]);
-  };
 
-  const handleReset = () => {
-    setMatrix(initialMatrix);
-    setClicks([]);
-  };
-
-  React.useEffect(() => {
-    if (clicks.length === 9) {
-      const orangeMatrix = initialMatrix.map((r, rowIndex) =>
-        r.map((c, colIndex) => {
-          const click = clicks.find(click => click.row === rowIndex && click.col === colIndex);
-          return click ? 'orange' : null;
-        })
-      );
-
+    if (row === 2 && col === 2 && clicks.length === 8) {
       setTimeout(() => {
-        setMatrix(orangeMatrix);
-      }, 1000);
+        let clickIndex = 0;
+        const interval = setInterval(() => {
+          if (clickIndex === clicks.length) {
+            clearInterval(interval);
+            return;
+          }
+
+          const { row, col } = clicks[clickIndex];
+          const updatedMatrix = matrix.map((r, rowIndex) =>
+            r.map((c, colIndex) => {
+              if (rowIndex === row && colIndex === col) return 'orange';
+              return c;
+            })
+          );
+
+          setMatrix(updatedMatrix);
+          clickIndex++;
+        }, 500);
+      }, 500);
     }
-  }, [clicks]);
+  };
 
   return (
     <div className="App">
-      <h1>Internship Task</h1>
       <div className="matrix">
         {matrix.map((row, rowIndex) =>
           row.map((col, colIndex) => (
@@ -55,9 +56,8 @@ function App() {
           ))
         )}
       </div>
-      <button onClick={handleReset}>Reset</button>
     </div>
   );
 }
 
-export default App;
+export default App;  
